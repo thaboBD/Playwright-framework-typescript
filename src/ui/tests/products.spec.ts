@@ -14,23 +14,20 @@ test.describe('Products functionality', () => {
     test('E2E : Purchase flow', async ({ page }) => {
         
         const inventoryPage = new InventoryPage(page);
-        await inventoryPage.filterProducts(productFilterOptions.PRICE_LOW_TO_HIGH)
-        
-        const prices = await inventoryPage.getItemPrices();
+        const checkoutPage = new CheckoutPage(page);
 
+        await inventoryPage.filterProducts(productFilterOptions.PRICE_LOW_TO_HIGH)
+        const prices = await inventoryPage.getItemPrices();
         const sortedPrices = [...prices].sort((a, b) => a - b);
         expect(prices).toEqual(sortedPrices);
 
-        const checkoutPage = new CheckoutPage(page);
         
         await inventoryPage.addItemToCart('sauce-labs-onesie');
         let cartCount = await inventoryPage.getShoppingCartCount();
-
         expect(cartCount).toEqual(1);
-
+        
         await inventoryPage.addItemToCart('sauce-labs-bike-light');
         cartCount = await inventoryPage.getShoppingCartCount();
-
         expect(cartCount).toEqual(2);
 
         await inventoryPage.shoppingCartButton.click();
@@ -42,17 +39,14 @@ test.describe('Products functionality', () => {
         await expect(page.getByText('Sauce Labs Bike Light')).toBeVisible();
 
         await checkoutPage.checkoutButton.click();
-
         expect(page.url()).toContain('/checkout-step-one.html');
 
         await checkoutPage.enterCustomerInformation('John', 'Doe', '1234');
-
         await expect(page.getByText('Checkout: Overview')).toBeVisible();
         await expect(page.getByText('Sauce Labs Onesie')).toBeVisible();
         await expect(page.getByText('Sauce Labs Bike Light')).toBeVisible();
 
         await checkoutPage.finishButton.click();
-
         expect(page.url()).toContain('/checkout-complete.html');
         await expect(page.getByText('Checkout: Complete!')).toBeVisible();
         await expect(page.getByText('Thank you for your order!')).toBeVisible();

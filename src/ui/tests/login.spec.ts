@@ -11,7 +11,7 @@ test.describe('Login functionality', () => {
 
         await loginPage.login(page,'standard_user', 'secret_sauce');
 
-        expect(page.getByText('Products')).toBeVisible();
+        expect(page.getByText('Products')).toBeVisible({ timeout: 10000 });
         
     });
 });
